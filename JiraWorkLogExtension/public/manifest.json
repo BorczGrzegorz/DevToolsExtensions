@@ -1,0 +1,34 @@
+{
+  "short_name": "JLog",
+  "name": "Jira Worklog",
+  "version": "2.0",
+  "permissions": [
+    "<all_urls>",
+    "storage",
+    "notifications",
+    "cookies"
+  ],
+  "options_page": "options.html",
+  "web_accessible_resources": [
+    "jira128.png"
+  ],
+  "background": {
+    "scripts": [
+      "./static/js/background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+       "matches": ["http://*/*"],
+      "js": ["./static/js/content.js"]
+    }
+  ],
+  "icons": {
+    "128": "jira128.png"
+  },
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "popup.html"
+  }
+}
