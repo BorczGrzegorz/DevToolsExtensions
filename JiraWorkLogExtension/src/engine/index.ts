@@ -17,6 +17,7 @@ export interface Engine {
   getCookies: (domain: string) => Promise<Cookie[]>;
   onSettingsChange: (key: string, callback: (newValue: any, oldValue: any) => void) => void;
   openOptions: () => void;
+  openTab: (url: string) => void;
 }
 
 export class ChromeEngine implements Engine {
@@ -29,6 +30,10 @@ export class ChromeEngine implements Engine {
   };
   saveInStore = <T>(key: string, model: T) => {
     chrome.storage.local.set({ [key]: model });
+  };
+
+  openTab = (url: string) => {
+    chrome.tabs.create({ url });
   };
 
   getFromStore = <T>(key: string): Promise<T> => {
@@ -108,6 +113,10 @@ export class MemoryEngine implements Engine {
 
   saveInStore = <T>(key: string, model: T) => {
     this.values[key] = model;
+  };
+
+  openTab = (url: string) => {
+    console.log('OPEN TAB', url);
   };
 
   getFromStore = <T>(key: string): Promise<T> => {
