@@ -1,6 +1,11 @@
 import { getEngine, Cookie } from './../engine/index';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
-import { UsersDateWorklogDto, UsersDto, UserDto, IssueDto } from './devToolsDTO';
+import {
+  UsersDateWorklogDto,
+  UsersDto,
+  UserDto,
+  IssueDto,
+} from './devToolsDTO';
 import qs from 'qs';
 import { Settings } from '../models/Settings';
 import { SETTINGS_KEY } from '../models/Consts';
@@ -9,26 +14,47 @@ const isNullOrWhiteSpace = (value: string) => {
   return value === undefined || value === null || value === '' || value === ' ';
 };
 
-const setInterceptor = async (config: AxiosRequestConfig): Promise<AxiosRequestConfig> => {
+const setInterceptor = async (
+  config: AxiosRequestConfig
+): Promise<AxiosRequestConfig> => {
+  config.baseURL = await getServerAddress();
+  const jiraDomain = await getJiraDomain();
+  const boardId = await getBoardId();
+  const cookies: Cookie[] = await getEngine().getCookies(jiraDomain);
+  config.headers['x-cookie'] = cookies
+    .map((x) => `${x.name}=${x.value}`)
+    .join(';');
+  config.headers['x-board'] = boardId;
+  return config;
+};
+
+const getServerAddress = async (): Promise<string> => {
   const settings = await getEngine().getFromStore<Settings>(SETTINGS_KEY);
   if (isNullOrWhiteSpace(settings.serverAddress)) {
     console.log('ServerAddress is not set yet');
     throw new Error('Server addres has not been set yet!');
   }
+
+  return settings.serverAddress;
+};
+
+const getJiraDomain = async (): Promise<string> => {
+  const settings = await getEngine().getFromStore<Settings>(SETTINGS_KEY);
   if (isNullOrWhiteSpace(settings.jiraDomain)) {
     console.log('ServerAddress is not set yet');
     throw new Error('Jira domain has not been set yet!');
   }
 
-  config.baseURL = settings.serverAddress;
-  const cookies: Cookie[] = await getEngine().getCookies(settings.jiraDomain);
-  config.headers['x-cookie'] = cookies.map((x) => `${x.name}=${x.value}`).join(';');
-  return config;
+  return settings.jiraDomain;
 };
 
 const getBoardId = async (): Promise<string> => {
   const settings = await getEngine().getFromStore<Settings>(SETTINGS_KEY);
-  if (settings.boardId === undefined || settings.boardId === null || settings.boardId === '') {
+  if (
+    settings.boardId === undefined ||
+    settings.boardId === null ||
+    settings.boardId === ''
+  ) {
     console.log('ServerAddress is not set yet');
     throw new Error('Board Id has not been set yet!');
   }
@@ -67,17 +93,24 @@ export interface IssueSearchParams {
   issueAssignee?: string;
 }
 
-export const getIssues = async (searchParams: IssueSearchParams): Promise<IssueDto[]> => {
+export const getIssues = async (
+  searchParams: IssueSearchParams
+): Promise<IssueDto[]> => {
   let query = qs.stringify(searchParams);
-  const boardId = await getBoardId();
-  const response: AxiosResponse<IssueDto[]> = await axios.get(`/board/${boardId}/issues?${query}`);
+  const response: AxiosResponse<IssueDto[]> = await axios.get(
+    `/api/v2/issues?${query}`
+  );
   return response.data;
 };
 
-export const getUsersDateWorklog = async (searchParams: SearchParams): Promise<UsersDateWorklogDto> => {
+export const getUsersDateWorklog = async (
+  searchParams: SearchParams
+): Promise<UsersDateWorklogDto> => {
   let query = qs.stringify(searchParams);
   const boardId = await getBoardId();
-  const response: AxiosResponse<UsersDateWorklogDto> = await axios.get(`/board/${boardId}/users/dates/issues?${query}`);
+  const response: AxiosResponse<UsersDateWorklogDto> = await axios.get(
+    `/api/v2/users/dates/issues?${query}`
+  );
   return response.data;
 };
 
@@ -94,4 +127,4 @@ export const getUserName = async (): Promise<string> => {
 };
 
 export const logWork = (issueId: string, minutes: number) =>
-  axios.post(`/worklogs/issue/${issueId}/minutes/${minutes}`);
+  axios.post(`/api/v2worklogs/issue/${issueId}/minutes/${minutes}`);
