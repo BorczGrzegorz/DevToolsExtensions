@@ -1,12 +1,6 @@
 import { Dispatch } from 'redux';
 import { getEngine, Engine } from './../../engine/index';
-import {
-  ChangeSettingsAction,
-  ActionType,
-  ErrorAction,
-  LogWorkAction,
-  DeleteNotificationsAction,
-} from './models';
+import { ChangeSettingsAction, ActionType, ErrorAction, LogWorkAction, DeleteNotificationsAction } from './models';
 import { getUserName, getUsersDateWorklog } from '../../api/devToolsApi';
 import { LoadUserSummaryAction } from './models/index';
 import { Settings } from '../../models/Settings';
@@ -22,9 +16,7 @@ export const errorHandler = (error: any) => async (dispatch: Dispatch) => {
   });
 };
 
-export const changeSettings = (settings: Settings) => async (
-  dispatch: Dispatch
-) => {
+export const changeSettings = (settings: Settings) => async (dispatch: Dispatch) => {
   getEngine().saveInStore(SETTINGS_KEY, settings);
   dispatch<ChangeSettingsAction>({
     type: ActionType.ChangeSettings,
@@ -41,9 +33,7 @@ export const loadSummary = () => async (dispatch: Dispatch) => {
   });
 };
 
-export const deleteNotifications = (notifications: Notification[]) => async (
-  dispatch: Dispatch
-) => {
+export const deleteNotifications = (notifications: Notification[]) => async (dispatch: Dispatch) => {
   await deleteNotificationsFromStore(notifications);
   dispatch<DeleteNotificationsAction>({
     type: ActionType.DeleteNotifications,
@@ -51,10 +41,8 @@ export const deleteNotifications = (notifications: Notification[]) => async (
   });
 };
 
-export const logWork = (notification: Notification, issueId: string) => async (
-  dispatch: Dispatch
-) => {
-  //await logWorkApi(issueId, notification.logWorkInMinutes);
+export const logWork = (notification: Notification, issueId: string) => async (dispatch: Dispatch) => {
+  await logWorkApi(issueId, notification.logWorkInMinutes);
   await deleteNotificationsFromStore([notification]);
   dispatch<LogWorkAction>({
     type: ActionType.LogWork,
@@ -65,17 +53,9 @@ export const logWork = (notification: Notification, issueId: string) => async (
   });
 };
 
-const deleteNotificationsFromStore = async (
-  notifications: Notification[]
-): Promise<void> => {
+const deleteNotificationsFromStore = async (notifications: Notification[]): Promise<void> => {
   const engine: Engine = getEngine();
-  let notificationsFromStore: Notification[] = await engine.getFromStore(
-    NOTIFICATIONS_KEY
-  );
-
-  notificationsFromStore = _.remove(notificationsFromStore, (n) =>
-    _.some(notifications, (x) => x.creationDate === n.creationDate)
-  );
-
+  let notificationsFromStore: Notification[] = await engine.getFromStore(NOTIFICATIONS_KEY);
+  _.remove(notificationsFromStore, (n) => _.some(notifications, (x) => x.creationDate === n.creationDate));
   engine.saveInStore(NOTIFICATIONS_KEY, notificationsFromStore);
 };

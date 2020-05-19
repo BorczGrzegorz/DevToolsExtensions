@@ -30,9 +30,7 @@ const Container = styled('div')({
   flexDirection: 'column',
 });
 
-export const NotificationExpansionPannel = (
-  props: NotificationExpansionPannelProps
-) => {
+export const NotificationExpansionPannel = (props: NotificationExpansionPannelProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const dispatch = useDispatch();
   return (
@@ -55,9 +53,7 @@ export const NotificationExpansionPannel = (
                 <CardHeader
                   title={moment(x.creationDate).format('HH:mm')}
                   action={
-                    <IconButton
-                      onClick={() => dispatch(deleteNotifications([x]))}
-                    >
+                    <IconButton onClick={() => dispatch(deleteNotifications([x]))}>
                       <DeleteIcon color='action' />
                     </IconButton>
                   }
@@ -74,7 +70,9 @@ export const NotificationExpansionPannel = (
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         onConfirm={() => {
+          console.log('ITEMS', props.items);
           dispatch(deleteNotifications(props.items));
+          setIsDialogOpen(false);
         }}
       />
     </>
