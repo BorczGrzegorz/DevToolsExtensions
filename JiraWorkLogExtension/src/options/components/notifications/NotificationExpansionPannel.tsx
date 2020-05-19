@@ -8,36 +8,62 @@ import {
   Card,
   Tab,
   Grid,
+  styled,
+  CardHeader,
+  IconButton,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import moment from 'moment';
 import { ConfirmationDialog } from '../../../controls/ConfirmationDialog';
 import { Notification } from '../../../models/Notifications';
 import { NotificationList } from './NotificationList';
+import { deleteNotifications } from '../../actions/actions';
+import { useDispatch } from 'react-redux';
 
 export interface NotificationExpansionPannelProps {
   date: string;
   items: Notification[];
 }
 
-export const NotificationExpansionPannel = (props: NotificationExpansionPannelProps) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const Container = styled('div')({
+  display: 'flex',
+  flexDirection: 'column',
+});
 
+export const NotificationExpansionPannel = (
+  props: NotificationExpansionPannelProps
+) => {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const dispatch = useDispatch();
   return (
     <>
-      <ExpansionPanel>
+      <ExpansionPanel key={props.date}>
         <ExpansionPanelSummary>
-          <Typography>{moment(props.date).format('D MMMM')}</Typography>
-          <DeleteIcon color='action' onClick={() => setIsDialogOpen(true)} />
+          <Typography>{moment(props.date).format('D MMMM YYYY')}</Typography>
+          <DeleteIcon
+            color='action'
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsDialogOpen(true);
+            }}
+          />
         </ExpansionPanelSummary>
         <ExpansionPanelDetails>
-          <Grid container direction='row'>
-            {props.items.map((x) => (
-              <>
-                <NotificationList key={x.creationDate} item={x} />
-                <NotificationList key={x.creationDate} item={x} />
-                <NotificationList key={x.creationDate} item={x} />
-              </>
+          <Grid key='notification-container' container direction='column'>
+            {props.items.map((x, i) => (
+              <Card>
+                <CardHeader
+                  title={moment(x.creationDate).format('HH:mm')}
+                  action={
+                    <IconButton
+                      onClick={() => dispatch(deleteNotifications([x]))}
+                    >
+                      <DeleteIcon color='action' />
+                    </IconButton>
+                  }
+                />
+                <NotificationList key={i} item={x} />
+              </Card>
             ))}
           </Grid>
         </ExpansionPanelDetails>
@@ -47,7 +73,9 @@ export const NotificationExpansionPannel = (props: NotificationExpansionPannelPr
         textContent='Are you sure?'
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onConfirm={() => {}}
+        onConfirm={() => {
+          dispatch(deleteNotifications(props.items));
+        }}
       />
     </>
   );

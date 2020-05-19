@@ -8,6 +8,9 @@ import { setEngine, MemoryEngine } from './engine';
 // IMPORTANT - ONLY FOR LOCAL TESTS!!!
 setEngine(new MemoryEngine());
 
-ReactDOM.render(<PopupApp routerComponent={BrowserRouter} />, document.getElementById('root'));
+// ReactDOM.render(<PopupApp routerComponent={BrowserRouter} />, document.getElementById('root'));
 
-// ReactDOM.render(<OptionsApp routerComponent={BrowserRouter} />, document.getElementById('root'));
+ReactDOM.render(
+  <OptionsApp routerComponent={BrowserRouter} />,
+  document.getElementById('root')
+);

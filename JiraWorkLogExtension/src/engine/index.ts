@@ -15,13 +15,19 @@ export interface Engine {
   getFromStore: <T>(key: string) => Promise<T>;
   saveInStore: <T>(key: string, model: T) => void;
   getCookies: (domain: string) => Promise<Cookie[]>;
-  onSettingsChange: (key: string, callback: (newValue: any, oldValue: any) => void) => void;
+  onSettingsChange: (
+    key: string,
+    callback: (newValue: any, oldValue: any) => void
+  ) => void;
   openOptions: () => void;
   openTab: (url: string) => void;
 }
 
 export class ChromeEngine implements Engine {
-  onSettingsChange = (key: string, callback: (newValue: any, oldValue: any) => void) => {
+  onSettingsChange = (
+    key: string,
+    callback: (newValue: any, oldValue: any) => void
+  ) => {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName === 'local' && changes[key]) {
         callback(changes[key].newValue, changes[key].oldValue);
@@ -58,7 +64,9 @@ export class ChromeEngine implements Engine {
   };
 
   openOptions = () => {
-    chrome.tabs.create({ url: 'chrome://extensions/?options=' + chrome.runtime.id });
+    chrome.tabs.create({
+      url: 'chrome://extensions/?options=' + chrome.runtime.id,
+    });
   };
 }
 
@@ -83,7 +91,7 @@ export class MemoryEngine implements Engine {
               return {
                 id: `id ${i}`,
                 key: `RMS ${i}`,
-                summary: `summary ${i}`,
+                summary: `[Verification] Dodanie kontekstów bazodanowych do naszego corowego komponentu ${i}`,
               } as Issue;
             }
           ),
@@ -139,7 +147,8 @@ export class MemoryEngine implements Engine {
         {
           domain,
           name: 'atlassian.xsrf.token',
-          value: 'B1ML-WBP8-CAED-WV8O_8ec483d29d55043cf11a8a13dbb61352d0ea52dc_lin',
+          value:
+            'B1ML-WBP8-CAED-WV8O_8ec483d29d55043cf11a8a13dbb61352d0ea52dc_lin',
         },
         {
           domain,
@@ -154,7 +163,10 @@ export class MemoryEngine implements Engine {
     return promise;
   };
 
-  onSettingsChange = (key: string, callback: (newValue: any, oldValue: any) => void) => {};
+  onSettingsChange = (
+    key: string,
+    callback: (newValue: any, oldValue: any) => void
+  ) => {};
 
   openOptions = () => {};
 }
