@@ -20,7 +20,7 @@
     "axios": "^0.19.2",
     "copy-to-clipboard": "^3.3.1",
     "guid-typescript": "^1.0.9",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "moment": "^2.24.0",
     "notistack": "^0.9.9",
     "react": "^16.11.0",
